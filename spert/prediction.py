@@ -81,7 +81,14 @@ def _convert_pred_relations(rel_clf: torch.tensor, rels: torch.tensor,
     pred_rel_scores = rel_clf[rel_nonzero]
 
     pred_rel_types = (rel_nonzero % rel_class_count) + 1  # model does not predict None class (+1)
-    valid_rel_indices = rel_nonzero // rel_class_count
+    #valid_rel_indices = rel_nonzero // rel_class_count
+    # replaced last line beased on UserWarning: 
+    #   __floordiv__ is deprecated, and its behavior will change in a future version of pytorch. 
+    #   It currently rounds toward 0 (like the 'trunc' function NOT 'floor'). 
+    #   This results in incorrect rounding for negative values. 
+    #   To keep the current behavior, use torch.div(a, b, rounding_mode='trunc'), 
+    #   or for actual floor division, use torch.div(a, b, rounding_mode='floor').
+    valid_rel_indices = torch.div(rel_nonzero, rel_class_count, rounding_mode="trunc")
     valid_rels = rels[valid_rel_indices]
 
     # get masks of entities in relation
