@@ -1,0 +1,84 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python: Current File",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "args": [
+                "train"
+            ]
+
+        },
+        {
+            "name": "spert-train",
+            "type": "python",
+            "request": "launch",
+            "program": "spert.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args": [
+                "train",
+                "--config","configs/example_train1.conf"
+                //"--label" , "conll04_train",
+                //"--model_type" , "spert",
+                //"--model_path" , "bert-base-cased",
+                //"--tokenizer_path" , "bert-base-cased",
+                //"--train_path" , "data/datasets/conll04/conll04_train.json",
+                //"--valid_path" , "data/datasets/conll04/conll04_dev.json",
+                //"--save_path" , "data/save/",
+                //"--types_path" , "data/datasets/conll04/conll04_types.json",
+                //"--train_batch_size" , "2",
+                //"--eval_batch_size" , "1",
+                //"--neg_entity_count" , "100",
+                //"--neg_relation_count" , "100",
+                //"--epochs" , "20",
+                //"--lr" , "5e-5",
+                //"--lr_warmup" , "0.1",
+                //"--weight_decay" , "0.01",
+                //"--max_grad_norm" , "1.0",
+                //"--rel_filter_threshold" , "0.4",
+                //"--size_embedding" , "25",
+                //"--prop_drop" , "0.1",
+                //"--max_span_size" , "10",
+                //"--store_predictions" , "True",
+                //"--store_examples" , "True",
+                //"--sampling_processes" , "4",
+                //"--max_pairs" , "1000",
+                //"--final_eval" , "True",
+                //"--log_path" , "data/log/", 
+            ]
+        },
+        {
+            "name": "spert-predict",
+            "type": "python",
+            "request": "launch",
+            "program": "spert.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args": [
+                "predict",
+                "--config","configs/example_predict.conf"
+            ]
+        },
+        {
+            "name": "spert-eval",
+            "type": "python",
+            "request": "launch",
+            "program": "spert.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args": [
+                "eval",
+                "--config","configs/example_eval.conf"
+            ]
+        }
+
+    ]
+}
