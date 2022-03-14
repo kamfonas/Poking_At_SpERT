@@ -1,15 +1,17 @@
 import argparse
+from logging import raiseExceptions
 import math
 import os
 from typing import Type
+from unittest import case
 
 import torch
 from torch.nn import DataParallel
 from torch.optim import Optimizer
 import transformers
 from torch.utils.data import DataLoader
-from transformers import AdamW, BertConfig
-from transformers import BertTokenizer
+from transformers import AdamW, BertConfig,RobertaConfig,LongformerConfig  
+from transformers import BertTokenizer,RobertaTokenizer,LongformerTokenizer
 
 from spert import models, prediction
 from spert import sampling
@@ -23,6 +25,8 @@ from spert.trainer import BaseTrainer
 
 SCRIPT_PATH = os.path.dirname(os.path.realpath(__file__))
 
+def get_model(name):
+    return _MODELS[name]
 
 class SpERTTrainer(BaseTrainer):
     """ Joint entity and relation extraction training and evaluation """
@@ -31,9 +35,22 @@ class SpERTTrainer(BaseTrainer):
         super().__init__(args)
 
         # byte-pair encoding
-        self._tokenizer = BertTokenizer.from_pretrained(args.tokenizer_path,
+        mtype = args.model_type
+        if mtype == 'spert':
+            self._tokenizer = BertTokenizer.from_pretrained(args.tokenizer_path,
                                                         do_lower_case=args.lowercase,
                                                         cache_dir=args.cache_path)
+        elif mtype == 'sprob':
+            self._tokenizer = RobertaTokenizer.from_pretrained(args.tokenizer_path,
+                                                        do_lower_case=args.lowercase,
+                                                        cache_dir=args.cache_path)
+        elif mtype == 'splong':
+            self._tokenizer = LongformerTokenizer.from_pretrained(args.tokenizer_path,
+                                                        do_lower_case=args.lowercase,
+                                                        cache_dir=args.cache_path)
+        else:
+            raise Exception("Argument model_type was mtype but it must be one of %s"%['spert','sprob','splong'])
+        
 
     def train(self, train_path: str, valid_path: str, types_path: str, input_reader_cls: Type[BaseInputReader]):
         args = self._args
@@ -149,8 +166,17 @@ class SpERTTrainer(BaseTrainer):
 
     def _load_model(self, input_reader):
         model_class = models.get_model(self._args.model_type)
+        mtype = self._args.model_type
 
-        config = BertConfig.from_pretrained(self._args.model_path, cache_dir=self._args.cache_path)
+        if mtype == 'spert':
+            config = BertConfig.from_pretrained(self._args.model_path, cache_dir=self._args.cache_path)
+        elif mtype == 'sprob':
+            config = RobertaConfig.from_pretrained(self._args.model_path, cache_dir=self._args.cache_path)
+        elif mtype == 'splong':
+            config = LongformerConfig.from_pretrained(self._args.model_path, cache_dir=self._args.cache_path)
+        else:
+            raise Exception("Argument model_type must be one of %s"%['spert','sprob','splong'])
+        
         util.check_version(config, model_class, self._args.model_path)
 
         config.spert_version = model_class.VERSION

@@ -22,10 +22,34 @@
             "request": "launch",
             "program": "spert.py",
             "console": "integratedTerminal",
-            "justMyCode": true,
+            "justMyCode": false,
             "args": [
                 "train",
                 "--config","configs/example_train1.conf",
+            ]
+        },
+        {
+            "name": "sprob-train",
+            "type": "python",
+            "request": "launch",
+            "program": "spert.py",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "args": [
+                "train",
+                "--config","configs/train_roberta1.conf",
+            ]
+        },
+        {
+            "name": "splong-train",
+            "type": "python",
+            "request": "launch",
+            "program": "spert.py",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "args": [
+                "train",
+                "--config","configs/train_longformer1.conf",
             ]
         },
         {
