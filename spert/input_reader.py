@@ -228,13 +228,14 @@ def _parse_tokens(jtokens, dataset, tokenizer):
     doc_tokens = []
 
     # full document encoding including special tokens ([CLS] and [SEP]) and byte-pair encodings of original tokens
-    doc_encoding = [tokenizer.convert_tokens_to_ids('[CLS]')]
-
+    #doc_encoding = [tokenizer.convert_tokens_to_ids('[CLS]')]
+    doc_encoding = [tokenizer.cls_token_id]
     # parse tokens
     for i, token_phrase in enumerate(jtokens):
         token_encoding = tokenizer.encode(token_phrase, add_special_tokens=False)
         if not token_encoding:
-            token_encoding = [tokenizer.convert_tokens_to_ids('[UNK]')]
+            #token_encoding = [tokenizer.convert_tokens_to_ids('[UNK]')]
+            token_encoding = [tokenizer.unk_token_id]
         span_start, span_end = (len(doc_encoding), len(doc_encoding) + len(token_encoding))
 
         token = dataset.create_token(i, span_start, span_end, token_phrase)
@@ -242,6 +243,7 @@ def _parse_tokens(jtokens, dataset, tokenizer):
         doc_tokens.append(token)
         doc_encoding += token_encoding
 
-    doc_encoding += [tokenizer.convert_tokens_to_ids('[SEP]')]
+    #doc_encoding += [tokenizer.convert_tokens_to_ids('[SEP]')]
+    doc_encoding += [tokenizer.sep_token_id]
 
     return doc_tokens, doc_encoding

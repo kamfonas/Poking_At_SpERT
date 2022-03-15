@@ -191,7 +191,7 @@ def create_rel_mask(s1, s2, context_size):
     return mask
 
 
-def collate_fn_padding(batch):
+def collate_fn_padding(batch, padding=0):
     padded_batch = dict()
     keys = batch[0].keys()
 
@@ -201,6 +201,6 @@ def collate_fn_padding(batch):
         if not batch[0][key].shape:
             padded_batch[key] = torch.stack(samples)
         else:
-            padded_batch[key] = util.padded_stack([s[key] for s in batch])
+            padded_batch[key] = util.padded_stack([s[key] for s in batch],padding=padding)
 
     return padded_batch

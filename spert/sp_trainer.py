@@ -25,8 +25,6 @@ from spert.trainer import BaseTrainer
 
 SCRIPT_PATH = os.path.dirname(os.path.realpath(__file__))
 
-def get_model(name):
-    return _MODELS[name]
 
 class SpERTTrainer(BaseTrainer):
     """ Joint entity and relation extraction training and evaluation """
@@ -51,6 +49,8 @@ class SpERTTrainer(BaseTrainer):
         else:
             raise Exception("Argument model_type was mtype but it must be one of %s"%['spert','sprob','splong'])
         
+    def collate_fn_padding(self, batch):
+            return sampling.collate_fn_padding(batch, padding=self._tokenizer.pad_token_id)
 
     def train(self, train_path: str, valid_path: str, types_path: str, input_reader_cls: Type[BaseInputReader]):
         args = self._args
@@ -183,7 +183,8 @@ class SpERTTrainer(BaseTrainer):
         model = model_class.from_pretrained(self._args.model_path,
                                             config=config,
                                             # SpERT model parameters
-                                            cls_token=self._tokenizer.convert_tokens_to_ids('[CLS]'),
+                                            #cls_token=self._tokenizer.convert_tokens_to_ids('[CLS]'),
+                                            cls_token=self._tokenizer.cls_token_id,
                                             relation_types=input_reader.relation_type_count - 1,
                                             entity_types=input_reader.entity_type_count,
                                             max_pairs=self._args.max_pairs,
@@ -201,7 +202,7 @@ class SpERTTrainer(BaseTrainer):
         # create data loader
         dataset.switch_mode(Dataset.TRAIN_MODE)
         data_loader = DataLoader(dataset, batch_size=self._args.train_batch_size, shuffle=True, drop_last=True,
-                                 num_workers=self._args.sampling_processes, collate_fn=sampling.collate_fn_padding)
+                                 num_workers=self._args.sampling_processes, collate_fn=self.collate_fn_padding)
 
         model.zero_grad()
 
