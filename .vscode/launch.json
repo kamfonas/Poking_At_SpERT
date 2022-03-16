@@ -25,7 +25,7 @@
             "justMyCode": false,
             "args": [
                 "train",
-                "--config","configs/example_train1.conf",
+                "--config","configs/train_bert1.conf",
             ]
         },
         {
