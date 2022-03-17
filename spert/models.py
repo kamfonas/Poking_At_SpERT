@@ -235,7 +235,7 @@ class SpROB(RobertaPreTrainedModel):
         super(SpROB, self).__init__(config)
 
         # BERT model
-        self.bert = RobertaModel(config)
+        self.roberta = RobertaModel(config)
 
         # layers
         self.rel_classifier = nn.Linear(config.hidden_size * 3 + size_embedding * 2, relation_types)
@@ -255,14 +255,14 @@ class SpROB(RobertaPreTrainedModel):
             print("Freeze transformer weights")
 
             # freeze all transformer weights
-            for param in self.bert.parameters():
+            for param in self.roberta.parameters():
                 param.requires_grad = False
 
     def _forward_train(self, encodings: torch.tensor, context_masks: torch.tensor, entity_masks: torch.tensor,
                        entity_sizes: torch.tensor, relations: torch.tensor, rel_masks: torch.tensor):
         # get contextualized token embeddings from last transformer layer
         context_masks = context_masks.float()
-        h = self.bert(input_ids=encodings, attention_mask=context_masks)['last_hidden_state']
+        h = self.roberta(input_ids=encodings, attention_mask=context_masks)['last_hidden_state']
 
         batch_size = encodings.shape[0]
 
@@ -289,7 +289,7 @@ class SpROB(RobertaPreTrainedModel):
                            entity_sizes: torch.tensor, entity_spans: torch.tensor, entity_sample_masks: torch.tensor):
         # get contextualized token embeddings from last transformer layer
         context_masks = context_masks.float()
-        h = self.bert(input_ids=encodings, attention_mask=context_masks)['last_hidden_state']
+        h = self.roberta(input_ids=encodings, attention_mask=context_masks)['last_hidden_state']
 
         batch_size = encodings.shape[0]
         ctx_size = context_masks.shape[-1]
@@ -438,7 +438,7 @@ class SpLONG(LongformerPreTrainedModel):
         super(SpLONG, self).__init__(config)
 
         # BERT model
-        self.bert = LongformerModel(config)
+        self.longformer = LongformerModel(config)
 
         # layers
         self.rel_classifier = nn.Linear(config.hidden_size * 3 + size_embedding * 2, relation_types)
@@ -458,14 +458,14 @@ class SpLONG(LongformerPreTrainedModel):
             print("Freeze transformer weights")
 
             # freeze all transformer weights
-            for param in self.bert.parameters():
+            for param in self.longformer.parameters():
                 param.requires_grad = False
 
     def _forward_train(self, encodings: torch.tensor, context_masks: torch.tensor, entity_masks: torch.tensor,
                        entity_sizes: torch.tensor, relations: torch.tensor, rel_masks: torch.tensor):
         # get contextualized token embeddings from last transformer layer
         context_masks = context_masks.float()
-        h = self.bert(input_ids=encodings, attention_mask=context_masks)['last_hidden_state']
+        h = self.longformer(input_ids=encodings, attention_mask=context_masks)['last_hidden_state']
 
         batch_size = encodings.shape[0]
 
@@ -492,7 +492,7 @@ class SpLONG(LongformerPreTrainedModel):
                            entity_sizes: torch.tensor, entity_spans: torch.tensor, entity_sample_masks: torch.tensor):
         # get contextualized token embeddings from last transformer layer
         context_masks = context_masks.float()
-        h = self.bert(input_ids=encodings, attention_mask=context_masks)['last_hidden_state']
+        h = self.longformer(input_ids=encodings, attention_mask=context_masks)['last_hidden_state']
 
         batch_size = encodings.shape[0]
         ctx_size = context_masks.shape[-1]
