@@ -75,7 +75,31 @@
                 "eval",
                 "--config","configs/example_eval.conf"
             ]
-        }
+        },
+        {
+            "name": "sprob-eval",
+            "type": "python",
+            "request": "launch",
+            "program": "spert.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args": [
+                "eval",
+                "--config","configs/example_eval.conf"
+            ]
+        },
+        {
+            "name": "splong-eval",
+            "type": "python",
+            "request": "launch",
+            "program": "spert.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args": [
+                "eval",
+                "--config","configs/train_longformer1.conf"
+            ]
+        },
 
     ]
 }
