@@ -17,6 +17,7 @@
 
         },
         {
+            // oringinal spert example using new config file
             "name": "spert-train",
             "type": "python",
             "request": "launch",
@@ -29,6 +30,7 @@
             ]
         },
         {
+            // Roberta variant train configuration
             "name": "sprob-train",
             "type": "python",
             "request": "launch",
@@ -41,6 +43,7 @@
             ]
         },
         {
+            // Longformer variant train configuration
             "name": "splong-train",
             "type": "python",
             "request": "launch",
@@ -53,6 +56,7 @@
             ]
         },
         {
+            // Prediction using original example prediction configuration
             "name": "spert-predict",
             "type": "python",
             "request": "launch",
@@ -65,6 +69,7 @@
             ]
         },
         {
+            // Bert evaluation equivalent to original eval example
             "name": "spert-eval",
             "type": "python",
             "request": "launch",
@@ -73,10 +78,12 @@
             "justMyCode": true,
             "args": [
                 "eval",
-                "--config","configs/example_eval.conf"
+                "--config","configs/eval_bert1.conf"
             ]
         },
         {
+            // Roberta evaluation configuration
+            //picks up model from models//roberta/<dataset>
             "name": "sprob-eval",
             "type": "python",
             "request": "launch",
@@ -85,7 +92,7 @@
             "justMyCode": true,
             "args": [
                 "eval",
-                "--config","configs/example_eval.conf"
+                "--config","configs/eval_roberta1.conf"
             ]
         },
         {
@@ -97,7 +104,7 @@
             "justMyCode": true,
             "args": [
                 "eval",
-                "--config","configs/train_longformer1.conf"
+                "--config","configs/eval_longformer1.conf"
             ]
         },
 

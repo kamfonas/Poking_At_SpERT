@@ -108,6 +108,7 @@ venv.bak/
 data/
 tmp/
 .idea/
+.vscode/
 runs/
 *.state
 checkpoint
