@@ -27,7 +27,7 @@
             "args": [
                 "train",
                 "--config",
-                    // "configs/example_train.conf", // original weights (Eberts and Alges)
+                    // "configs/example_train.conf", // original weights (Eberts and Ulges)
                     "configs/train_bert1.conf", // Our best of 5 bert-conll04 run
             ]
         },
