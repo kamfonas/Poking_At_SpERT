@@ -28,8 +28,10 @@
                 "train",
                 "--config",
                     // "configs/example_train.conf", // original weights (Eberts and Ulges)
-                    "configs/train_bert1.conf", // Our best of 5 bert-conll04 run
-            ]
+                    //"configs/train_bert1.conf", // Our best of 5 bert-conll04 run
+                    //"configs/train_bert2.conf", // Our best of 5 bert-ADE run
+                    "configs/train_bert3.conf", // Our best of 5 bert-sciERC run
+                ]
         },
         {
             // Roberta variant train configuration
@@ -41,7 +43,9 @@
             "justMyCode": false,
             "args": [
                 "train",
-                "--config","configs/train_roberta1.conf",
+                //"--config","configs/train_roberta1.conf",
+                //"--config","configs/train_roberta2.conf",
+                "--config","configs/train_roberta3.conf",
             ]
         },
         {
@@ -54,7 +58,22 @@
             "justMyCode": false,
             "args": [
                 "train",
+                //"--config","configs/train_longformer1.conf",
                 "--config","configs/train_longformer1.conf",
+            ]
+        },
+        {
+            // Longformer variant train configuration
+            "name": "spelec-train",
+            "type": "python",
+            "request": "launch",
+            "program": "spert.py",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "args": [
+                "train",
+                //"--config","configs/train_longformer1.conf",
+                "--config","configs/train_electra1.conf",
             ]
         },
         {
