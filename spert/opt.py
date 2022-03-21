@@ -1,7 +1,7 @@
 # optional packages
 
 try:
-    import tensorboardX
+    import tensorboardXX 
 except ImportError:
     tensorboardX = None
 
