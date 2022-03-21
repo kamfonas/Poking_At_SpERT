@@ -5,12 +5,14 @@ from typing import List, Tuple, Dict
 
 import torch
 from sklearn.metrics import precision_recall_fscore_support as prfs
-from transformers import BertTokenizer
+from transformers import BertTokenizer,RobertaTokenizer, LongformerTokenizer
 
 from spert import prediction
 from spert.entities import Document, Dataset, EntityType
 from spert.input_reader import BaseInputReader
 from spert.opt import jinja2
+
+import pandas as pd
 
 SCRIPT_PATH = os.path.dirname(os.path.realpath(__file__))
 
@@ -18,7 +20,7 @@ SCRIPT_PATH = os.path.dirname(os.path.realpath(__file__))
 class Evaluator:
     def __init__(self, dataset: Dataset, input_reader: BaseInputReader, text_encoder: BertTokenizer,
                  rel_filter_threshold: float, no_overlapping: bool,
-                 predictions_path: str, examples_path: str, example_count: int):
+                 predictions_path: str, examples_path: str, example_count: int, log_path = SCRIPT_PATH.join('data')):
         self._text_encoder = text_encoder
         self._input_reader = input_reader
         self._dataset = dataset
@@ -27,6 +29,7 @@ class Evaluator:
 
         self._predictions_path = predictions_path
         self._examples_path = examples_path
+        self._log_path = log_path
 
         self._example_count = example_count
 
@@ -61,7 +64,8 @@ class Evaluator:
         print("An entity is considered correct if the entity type and span is predicted correctly")
         print("")
         gt, pred = self._convert_by_setting(self._gt_entities, self._pred_entities, include_entity_types=True)
-        ner_eval = self._score(gt, pred, print_results=True)
+        ner_eval, ner_eval_df = self._score(gt, pred, print_results=True)
+        
 
         print("")
         print("--- Relations ---")
@@ -71,7 +75,7 @@ class Evaluator:
               "related entities are predicted correctly (entity type is not considered)")
         print("")
         gt, pred = self._convert_by_setting(self._gt_relations, self._pred_relations, include_entity_types=False)
-        rel_eval = self._score(gt, pred, print_results=True)
+        rel_eval, rel_eval_df = self._score(gt, pred, print_results=True)
 
         print("")
         print("With named entity classification (NEC)")
@@ -79,7 +83,11 @@ class Evaluator:
               "related entities are predicted correctly (in span and entity type)")
         print("")
         gt, pred = self._convert_by_setting(self._gt_relations, self._pred_relations, include_entity_types=True)
-        rel_nec_eval = self._score(gt, pred, print_results=True)
+        rel_nec_eval, rel_nec_eval_df = self._score(gt, pred, print_results=True)
+
+        ner_eval_df.to_csv( self._log_path+'/eval_ner_df.csv')
+        rel_eval_df.to_csv( self._log_path+'/eval_rel_df.csv')
+        rel_nec_eval_df.to_csv( self._log_path+'/eval_rel_nec_df.csv')
 
         return ner_eval, rel_eval, rel_nec_eval
 
@@ -217,8 +225,8 @@ class Evaluator:
                 else:
                     pred_flat.append(0)
 
-        metrics = self._compute_metrics(gt_flat, pred_flat, types, print_results)
-        return metrics
+        metrics , eval_df = self._compute_metrics(gt_flat, pred_flat, types, print_results)
+        return metrics, eval_df
 
     def _compute_metrics(self, gt_all, pred_all, types, print_results: bool = False):
         labels = [t.index for t in types]
@@ -227,10 +235,18 @@ class Evaluator:
         macro = prfs(gt_all, pred_all, labels=labels, average='macro', zero_division=0)[:-1]
         total_support = sum(per_type[-1])
 
+        per_type_df = pd.DataFrame(per_type).T
+        per_type_df = per_type_df.set_axis([t.identifier for t in types],axis=0, inplace=False)
+        per_type_df.columns = ['precision','recall','F1','support'] 
+
+        summ_df     = pd.DataFrame([micro,macro], index = ['micro','macro'],columns=['precision','recall','F1'])
+        summ_df     = summ_df.assign(support = [total_support,total_support])
+        eval_df = pd.concat([per_type_df,summ_df])
+
         if print_results:
             self._print_results(per_type, list(micro) + [total_support], list(macro) + [total_support], types)
 
-        return [m * 100 for m in micro + macro]
+        return [m * 100 for m in micro + macro],eval_df
 
     def _print_results(self, per_type: List, micro: List, macro: List, types: List):
         columns = ('type', 'precision', 'recall', 'f1-score', 'support')
@@ -278,7 +294,7 @@ class Evaluator:
         # get micro precision/recall/f1 scores
         if gt or pred:
             pred_s = [p[:3] for p in pred]  # remove score
-            precision, recall, f1 = self._score([gt], [pred_s])[:3]
+            precision, recall, f1 = self._score([gt], [pred_s])[0][:3]
         else:
             # corner case: no ground truth and no predictions
             precision, recall, f1 = [100] * 3

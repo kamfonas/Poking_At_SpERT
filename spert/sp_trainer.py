@@ -10,8 +10,8 @@ from torch.nn import DataParallel
 from torch.optim import Optimizer
 import transformers
 from torch.utils.data import DataLoader
-from transformers import AdamW, BertConfig,RobertaConfig,LongformerConfig  
-from transformers import BertTokenizer,RobertaTokenizer,LongformerTokenizer
+from transformers import AdamW, BertConfig,RobertaConfig,LongformerConfig, ElectraConfig
+from transformers import BertTokenizer,RobertaTokenizer,LongformerTokenizer, ElectraTokenizer
 
 from spert import models, prediction
 from spert import sampling
@@ -46,8 +46,12 @@ class SpERTTrainer(BaseTrainer):
             self._tokenizer = LongformerTokenizer.from_pretrained(args.tokenizer_path,
                                                         do_lower_case=args.lowercase,
                                                         cache_dir=args.cache_path)
+        elif mtype == 'spelec':
+            self._tokenizer = ElectraTokenizer.from_pretrained(args.tokenizer_path,
+                                                        do_lower_case=args.lowercase,
+                                                        cache_dir=args.cache_path)
         else:
-            raise Exception("Argument model_type was mtype but it must be one of %s"%['spert','sprob','splong'])
+            raise Exception("Argument model_type was %s but it must be one of %s"% (mtype,['spert','sprob','spelec','splong']))
         
     def collate_fn_padding(self, batch):
             return sampling.collate_fn_padding(batch, padding=self._tokenizer.pad_token_id)
@@ -172,6 +176,8 @@ class SpERTTrainer(BaseTrainer):
             config = BertConfig.from_pretrained(self._args.model_path, cache_dir=self._args.cache_path)
         elif mtype == 'sprob':
             config = RobertaConfig.from_pretrained(self._args.model_path, cache_dir=self._args.cache_path)
+        elif mtype == 'spelec':
+            config = ElectraConfig.from_pretrained(self._args.model_path, cache_dir=self._args.cache_path)
         elif mtype == 'splong':
             config = LongformerConfig.from_pretrained(self._args.model_path, cache_dir=self._args.cache_path)
         else:
@@ -245,7 +251,7 @@ class SpERTTrainer(BaseTrainer):
         examples_path = os.path.join(self._log_path, f'examples_%s_{dataset.label}_epoch_{epoch}.html')
         evaluator = Evaluator(dataset, input_reader, self._tokenizer,
                               self._args.rel_filter_threshold, self._args.no_overlapping, predictions_path,
-                              examples_path, self._args.example_count)
+                              examples_path, self._args.example_count, log_path = self._log_path)
 
         # create data loader
         dataset.switch_mode(Dataset.EVAL_MODE)
