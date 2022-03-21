@@ -1,7 +1,17 @@
-# SpERT: Span-based Entity and Relation Transformer
-PyTorch code for SpERT: "Span-based Entity and Relation Transformer". For a description of the model and experiments, see our paper: https://arxiv.org/abs/1909.07755 (published at ECAI 2020).
+
+
+# Experimenting with SpERT: A Span-based Entity and Relation Transformer
+The code above is based on the PyTorch implementation for SpERT: "Span-based Entity and Relation Transformer" by Eberts and Lavis. For a description of the original model and experiments, see their paper: https://arxiv.org/abs/1909.07755 (published at ECAI 2020).
 
 ![alt text](http://deepca.cs.hs-rm.de/img/deepca/spert.png)
+
+## Modifications for the Experimenting with SpERT version:
+
+The original readme file is kept intact, starting from the setup section. This section describes changes made to the code and the configuration to support additional models and different datasets.
+
+1.  The models.py has been modified to include three more variants beyond the original BERT, i.e. RoBERTa, Electra and allenai/Longformer. Since Roberta by default uses different tokens and embeddings for the separator, padding and classification tokens, all places where these tokens were looked-up based on the token have been replaced to use the tokenizer methods sep_token_id, pad_token_id and cls_token_id respectively. Additional changes in the evaluation, trainer and data_loader are pretty minor and self-contained. 
+2.  Configuration file naming convention now includes the combination of mode (eval, train, predict), the model and a number denoting the dataset used. There have also been commented alternative models (e.g. sciBERT and allenai/biomed_roberta_base for use with the sciERC dataset)
+
 
 ## Setup
 ### Requirements
