@@ -73,7 +73,9 @@
             "args": [
                 "train",
                 //"--config","configs/train_longformer1.conf",
-                "--config","configs/train_electra1.conf",
+                //"--config","configs/train_electra1.conf",
+                //"--config","configs/train_electra2.conf",
+                "--config","configs/train_electra3.conf",
             ]
         },
         {
