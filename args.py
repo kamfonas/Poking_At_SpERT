@@ -30,6 +30,10 @@ def _add_common_args(arg_parser):
     arg_parser.add_argument('--no_overlapping', action='store_true', default=False,
                             help="If true, do not evaluate on overlapping entities "
                                  "and relations with overlapping entities")
+    arg_parser.add_argument('--output_hidden_states', action='store_true', default=False , 
+                            help="If True Transformer will output all hidden layer states")
+    arg_parser.add_argument('--hidden_state_from_layer', type=int, default= 9 , 
+                            help="Transfomer layer from which to output hidden state. Used if output_hidden_states=True")
 
     # Misc
     arg_parser.add_argument('--seed', type=int, default=None, help="Seed")

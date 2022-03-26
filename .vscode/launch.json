@@ -102,8 +102,8 @@
             "args": [
                 "eval",
                 "--config",
-                    "configs/example_eval.conf"  // Eberts and Adrian weights
-                    // "configs/eval_bert1.conf"  // our best of 5 runs weights
+                    //"configs/example_eval.conf"  // Eberts and Adrian weights
+                     "configs/eval_bert1.conf"  // our best of 5 runs weights
             ]
         },
         {
