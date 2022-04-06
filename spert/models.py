@@ -27,7 +27,8 @@ class SpERT(BertPreTrainedModel):
     VERSION = '1.1'
 
     def __init__(self, config: BertConfig, cls_token: int, relation_types: int, entity_types: int,
-                 size_embedding: int, prop_drop: float, freeze_transformer: bool, max_pairs: int = 100):
+                 size_embedding: int, prop_drop: float, freeze_transformer: bool, max_pairs: int = 100,
+                 output_hidden_states: bool = False, hidden_state_from_layer: int = 11):
         super(SpERT, self).__init__(config)
 
         # BERT model
@@ -54,11 +55,20 @@ class SpERT(BertPreTrainedModel):
             for param in self.bert.parameters():
                 param.requires_grad = False
 
+        # Option to access lower than the top layer
+        self.output_hidden_states = output_hidden_states
+        self.hidden_state_from_layer = hidden_state_from_layer
+
     def _forward_train(self, encodings: torch.tensor, context_masks: torch.tensor, entity_masks: torch.tensor,
                        entity_sizes: torch.tensor, relations: torch.tensor, rel_masks: torch.tensor):
         # get contextualized token embeddings from last transformer layer
         context_masks = context_masks.float()
-        h = self.bert(input_ids=encodings, attention_mask=context_masks)['last_hidden_state']
+
+        outputs = self.bert(input_ids=encodings, attention_mask=context_masks, output_hidden_states = self.output_hidden_states)
+        if self.output_hidden_states:
+            h = outputs['hidden_states'][self.hidden_state_from_layer]
+        else:
+            h = outputs['last_hidden_state']
 
         batch_size = encodings.shape[0]
 
@@ -85,7 +95,12 @@ class SpERT(BertPreTrainedModel):
                            entity_sizes: torch.tensor, entity_spans: torch.tensor, entity_sample_masks: torch.tensor):
         # get contextualized token embeddings from last transformer layer
         context_masks = context_masks.float()
-        h = self.bert(input_ids=encodings, attention_mask=context_masks)['last_hidden_state']
+
+        outputs = self.bert(input_ids=encodings, attention_mask=context_masks, output_hidden_states = self.output_hidden_states)
+        if self.output_hidden_states:
+            h = outputs['hidden_states'][self.hidden_state_from_layer]
+        else:
+            h = outputs['last_hidden_state']
 
         batch_size = encodings.shape[0]
         ctx_size = context_masks.shape[-1]
@@ -231,7 +246,8 @@ class SpROB(RobertaPreTrainedModel):
     VERSION = '1.1'
 
     def __init__(self, config: RobertaConfig, cls_token: int, relation_types: int, entity_types: int,
-                 size_embedding: int, prop_drop: float, freeze_transformer: bool, max_pairs: int = 100):
+                 size_embedding: int, prop_drop: float, freeze_transformer: bool, max_pairs: int = 100,
+                 output_hidden_states: bool = False, hidden_state_from_layer: int = 11):
         super(SpROB, self).__init__(config)
 
         # BERT model
@@ -258,11 +274,20 @@ class SpROB(RobertaPreTrainedModel):
             for param in self.roberta.parameters():
                 param.requires_grad = False
 
+        # Option to access lower than the top layer
+        self.output_hidden_states = output_hidden_states
+        self.hidden_state_from_layer = hidden_state_from_layer
+
     def _forward_train(self, encodings: torch.tensor, context_masks: torch.tensor, entity_masks: torch.tensor,
                        entity_sizes: torch.tensor, relations: torch.tensor, rel_masks: torch.tensor):
         # get contextualized token embeddings from last transformer layer
         context_masks = context_masks.float()
-        h = self.roberta(input_ids=encodings, attention_mask=context_masks)['last_hidden_state']
+
+        outputs = self.roberta(input_ids=encodings, attention_mask=context_masks, output_hidden_states = self.output_hidden_states)
+        if self.output_hidden_states:
+            h = outputs['hidden_states'][self.hidden_state_from_layer]
+        else:
+            h = outputs['last_hidden_state']
 
         batch_size = encodings.shape[0]
 
@@ -289,7 +314,12 @@ class SpROB(RobertaPreTrainedModel):
                            entity_sizes: torch.tensor, entity_spans: torch.tensor, entity_sample_masks: torch.tensor):
         # get contextualized token embeddings from last transformer layer
         context_masks = context_masks.float()
-        h = self.roberta(input_ids=encodings, attention_mask=context_masks)['last_hidden_state']
+
+        outputs = self.roberta(input_ids=encodings, attention_mask=context_masks, output_hidden_states = self.output_hidden_states)
+        if self.output_hidden_states:
+            h = outputs['hidden_states'][self.hidden_state_from_layer]
+        else:
+            h = outputs['last_hidden_state']
 
         batch_size = encodings.shape[0]
         ctx_size = context_masks.shape[-1]
@@ -334,7 +364,7 @@ class SpROB(RobertaPreTrainedModel):
         entity_ctx = get_token(h, encodings, self._cls_token)
 
         # create candidate representations including context, max pooled span and size embedding
-        entity_repr = torch.cat([entity_ctx.unsqueeze(1).repeat(1, entity_spans_pool.shape[1], 1), entity_spans_pool, size_embeddings], dim=2)
+        entity_repr = torch.cat([entity_ctx.unsqueeze(1).repeat(1, entity_spans_pool.shape[1], 1),  entity_spans_pool, size_embeddings], dim=2)
         entity_repr = self.dropout(entity_repr)
 
         # classify entity candidates
@@ -434,7 +464,8 @@ class SpELEC(ElectraPreTrainedModel):
     VERSION = '1.1'
 
     def __init__(self, config: ElectraConfig, cls_token: int, relation_types: int, entity_types: int,
-                 size_embedding: int, prop_drop: float, freeze_transformer: bool, max_pairs: int = 100):
+                 size_embedding: int, prop_drop: float, freeze_transformer: bool, max_pairs: int = 100,
+                 output_hidden_states: bool = False, hidden_state_from_layer: int = 11):
         super(SpELEC, self).__init__(config)
 
         # BERT model
@@ -461,11 +492,21 @@ class SpELEC(ElectraPreTrainedModel):
             for param in self.electra.parameters():
                 param.requires_grad = False
 
+        # Option to access lower than the top layer
+        self.output_hidden_states = output_hidden_states
+        self.hidden_state_from_layer = hidden_state_from_layer
+
+
     def _forward_train(self, encodings: torch.tensor, context_masks: torch.tensor, entity_masks: torch.tensor,
                        entity_sizes: torch.tensor, relations: torch.tensor, rel_masks: torch.tensor):
         # get contextualized token embeddings from last transformer layer
         context_masks = context_masks.float()
-        h = self.electra(input_ids=encodings, attention_mask=context_masks)['last_hidden_state']
+
+        outputs = self.electra(input_ids=encodings, attention_mask=context_masks, output_hidden_states = self.output_hidden_states)
+        if self.output_hidden_states:
+            h = outputs['hidden_states'][self.hidden_state_from_layer]
+        else:
+            h = outputs['last_hidden_state']
 
         batch_size = encodings.shape[0]
 
@@ -492,7 +533,12 @@ class SpELEC(ElectraPreTrainedModel):
                            entity_sizes: torch.tensor, entity_spans: torch.tensor, entity_sample_masks: torch.tensor):
         # get contextualized token embeddings from last transformer layer
         context_masks = context_masks.float()
-        h = self.electra(input_ids=encodings, attention_mask=context_masks)['last_hidden_state']
+
+        outputs = self.electra(input_ids=encodings, attention_mask=context_masks, output_hidden_states = self.output_hidden_states)
+        if self.output_hidden_states:
+            h = outputs['hidden_states'][self.hidden_state_from_layer]
+        else:
+            h = outputs['last_hidden_state']
 
         batch_size = encodings.shape[0]
         ctx_size = context_masks.shape[-1]
@@ -637,7 +683,8 @@ class SpLONG(LongformerPreTrainedModel):
     VERSION = '1.1'
 
     def __init__(self, config: LongformerConfig, cls_token: int, relation_types: int, entity_types: int,
-                 size_embedding: int, prop_drop: float, freeze_transformer: bool, max_pairs: int = 100):
+                 size_embedding: int, prop_drop: float, freeze_transformer: bool, max_pairs: int = 100,
+                 output_hidden_states: bool = False, hidden_state_from_layer: int = 11):
         super(SpLONG, self).__init__(config)
 
         # BERT model
@@ -664,11 +711,21 @@ class SpLONG(LongformerPreTrainedModel):
             for param in self.longformer.parameters():
                 param.requires_grad = False
 
+        # Option to access lower than the top layer
+        self.output_hidden_states = output_hidden_states
+        self.hidden_state_from_layer = hidden_state_from_layer
+
+
     def _forward_train(self, encodings: torch.tensor, context_masks: torch.tensor, entity_masks: torch.tensor,
                        entity_sizes: torch.tensor, relations: torch.tensor, rel_masks: torch.tensor):
         # get contextualized token embeddings from last transformer layer
         context_masks = context_masks.float()
-        h = self.longformer(input_ids=encodings, attention_mask=context_masks)['last_hidden_state']
+
+        outputs = self.longformer(input_ids=encodings, attention_mask=context_masks, output_hidden_states = self.output_hidden_states)
+        if self.output_hidden_states:
+            h = outputs['hidden_states'][self.hidden_state_from_layer]
+        else:
+            h = outputs['last_hidden_state']
 
         batch_size = encodings.shape[0]
 
@@ -695,7 +752,12 @@ class SpLONG(LongformerPreTrainedModel):
                            entity_sizes: torch.tensor, entity_spans: torch.tensor, entity_sample_masks: torch.tensor):
         # get contextualized token embeddings from last transformer layer
         context_masks = context_masks.float()
-        h = self.longformer(input_ids=encodings, attention_mask=context_masks)['last_hidden_state']
+
+        outputs = self.longformer(input_ids=encodings, attention_mask=context_masks, output_hidden_states = self.output_hidden_states)
+        if self.output_hidden_states:
+            h = outputs['hidden_states'][self.hidden_state_from_layer]
+        else:
+            h = outputs['last_hidden_state']
 
         batch_size = encodings.shape[0]
         ctx_size = context_masks.shape[-1]

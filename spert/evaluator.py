@@ -5,7 +5,7 @@ from typing import List, Tuple, Dict
 
 import torch
 from sklearn.metrics import precision_recall_fscore_support as prfs
-from transformers import BertTokenizer,RobertaTokenizer, LongformerTokenizer
+from transformers import PreTrainedTokenizerFast #BertTokenizerFast,RobertaTokenizerFast, LongformerTokenizerFast
 
 from spert import prediction
 from spert.entities import Document, Dataset, EntityType
@@ -18,9 +18,10 @@ SCRIPT_PATH = os.path.dirname(os.path.realpath(__file__))
 
 
 class Evaluator:
-    def __init__(self, dataset: Dataset, input_reader: BaseInputReader, text_encoder: BertTokenizer,
+    def __init__(self, dataset: Dataset, input_reader: BaseInputReader, text_encoder: PreTrainedTokenizerFast,
                  rel_filter_threshold: float, no_overlapping: bool,
-                 predictions_path: str, examples_path: str, example_count: int, log_path = SCRIPT_PATH.join('data')):
+                 predictions_path: str, examples_path: str, example_count: int, log_path = SCRIPT_PATH.join('data'),
+                 f_score_beta = 1.0):
         self._text_encoder = text_encoder
         self._input_reader = input_reader
         self._dataset = dataset
@@ -33,6 +34,9 @@ class Evaluator:
 
         self._example_count = example_count
 
+        self.f_score_beta = f_score_beta
+        self.f_label = 'F1' if self.f_score_beta == 1.0 else 'F(%0.1f)'%self.f_score_beta 
+
         # relations
         self._gt_relations = []  # ground truth
         self._pred_relations = []  # prediction
@@ -44,6 +48,7 @@ class Evaluator:
         self._pseudo_entity_type = EntityType('Entity', 1, 'Entity', 'Entity')  # for span only evaluation
 
         self._convert_gt(self._dataset.documents)
+
 
     def eval_batch(self, batch_entity_clf: torch.tensor, batch_rel_clf: torch.tensor,
                    batch_rels: torch.tensor, batch: dict):
@@ -230,16 +235,16 @@ class Evaluator:
 
     def _compute_metrics(self, gt_all, pred_all, types, print_results: bool = False):
         labels = [t.index for t in types]
-        per_type = prfs(gt_all, pred_all, labels=labels, average=None, zero_division=0)
-        micro = prfs(gt_all, pred_all, labels=labels, average='micro', zero_division=0)[:-1]
-        macro = prfs(gt_all, pred_all, labels=labels, average='macro', zero_division=0)[:-1]
+        per_type = prfs(gt_all, pred_all, labels=labels, average=None, zero_division=0, beta=self.f_score_beta)
+        micro = prfs(gt_all, pred_all, labels=labels, average='micro', zero_division=0, beta=self.f_score_beta)[:-1]
+        macro = prfs(gt_all, pred_all, labels=labels, average='macro', zero_division=0, beta=self.f_score_beta)[:-1]
         total_support = sum(per_type[-1])
 
         per_type_df = pd.DataFrame(per_type).T
         per_type_df = per_type_df.set_axis([t.identifier for t in types],axis=0, inplace=False)
-        per_type_df.columns = ['precision','recall','F1','support'] 
+        per_type_df.columns = ['precision','recall',self.f_label,'support'] 
 
-        summ_df     = pd.DataFrame([micro,macro], index = ['micro','macro'],columns=['precision','recall','F1'])
+        summ_df     = pd.DataFrame([micro,macro], index = ['micro','macro'],columns=['precision','recall',self.f_label])
         summ_df     = summ_df.assign(support = [total_support,total_support])
         eval_df = pd.concat([per_type_df,summ_df])
 
@@ -249,7 +254,7 @@ class Evaluator:
         return [m * 100 for m in micro + macro],eval_df
 
     def _print_results(self, per_type: List, micro: List, macro: List, types: List):
-        columns = ('type', 'precision', 'recall', 'f1-score', 'support')
+        columns = ('type', 'precision', 'recall', '%s-score'%self.f_label, 'support')
 
         row_fmt = "%20s" + (" %12s" * (len(columns) - 1))
         results = [row_fmt % columns, '\n']

@@ -40,6 +40,7 @@ def _add_common_args(arg_parser):
     arg_parser.add_argument('--cache_path', type=str, default=None,
                             help="Path to cache transformer models (for HuggingFace transformers library)")
     arg_parser.add_argument('--debug', action='store_true', default=False, help="Debugging mode on/off")
+    arg_parser.add_argument('--f_score_beta', type=float, default=1.0 ,help="F-score beta (defaults to 1.0 for F1) ")
 
 
 def _add_logging_args(arg_parser):

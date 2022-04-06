@@ -27,10 +27,27 @@
             "args": [
                 "train",
                 "--config",
-                    // "configs/example_train.conf", // original weights (Eberts and Ulges)
+                     "configs/example_train.conf", // original weights (Eberts and Ulges)
                     //"configs/train_bert1.conf", // Our best of 5 bert-conll04 run
                     //"configs/train_bert2.conf", // Our best of 5 bert-ADE run
-                    "configs/train_bert3.conf", // Our best of 5 bert-sciERC run
+                    //"configs/train_bert3.conf", // Our best of 5 bert-sciERC run
+                ]
+        },
+        {
+            // oringinal spert example using new config file
+            "name": "spert-train-L",
+            "type": "python",
+            "request": "launch",
+            "program": "spert.py",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "args": [
+                "train",
+                "--config",
+                    //"configs/train_bert1L.conf", // Our best of 5 bert-conll04 run
+                    //"configs/train_bert2L.conf", // Our best of 5 bert-ADE run
+                    //"configs/train_bert3L.conf", // Our best of 5 bert-sciERC run
+                    "configs/train_bert4L.conf", // Our best of 5 bert-sciERC run
                 ]
         },
         {
@@ -40,13 +57,28 @@
             "request": "launch",
             "program": "spert.py",
             "console": "integratedTerminal",
-            "justMyCode": false,
+            "justMyCode": true,
             "args": [
                 "train",
-                //"--config","configs/train_roberta1.conf",
+                "--config","configs/train_roberta1.conf",
                 //"--config","configs/train_roberta2.conf",
-                "--config","configs/train_roberta3.conf",
+                //"--config","configs/train_roberta3.conf",
             ]
+        },
+        {
+            // Roberta variant train configuration
+            "name": "sprob-train-L",
+            "type": "python",
+            "request": "launch",
+            "program": "spert.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args": [
+                "train",
+                //"--config","configs/train_roberta1L.conf",
+                //"--config","configs/train_roberta2L.conf",
+                //"--config","configs/train_roberta3L.conf",
+                "--config","configs/train_roberta4L.conf",            ]
         },
         {
             // Longformer variant train configuration
@@ -104,6 +136,21 @@
                 "--config",
                     //"configs/example_eval.conf"  // Eberts and Adrian weights
                      "configs/eval_bert1.conf"  // our best of 5 runs weights
+            ]
+        },
+        {
+            // Bert evaluation equivalent to original eval example
+            "name": "spert-eval-L",
+            "type": "python",
+            "request": "launch",
+            "program": "spert.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args": [
+                "eval",
+                "--config",
+                    //"configs/example_eval.conf"  // Eberts and Adrian weights
+                     "configs/eval_bert4L.conf"  // our best of 5 runs weights
             ]
         },
         {

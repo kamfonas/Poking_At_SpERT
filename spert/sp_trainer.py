@@ -11,7 +11,7 @@ from torch.optim import Optimizer
 import transformers
 from torch.utils.data import DataLoader
 from transformers import AdamW, BertConfig,RobertaConfig,LongformerConfig, ElectraConfig
-from transformers import BertTokenizer,RobertaTokenizer,LongformerTokenizer, ElectraTokenizer
+from transformers import BertTokenizerFast,RobertaTokenizerFast,LongformerTokenizerFast, ElectraTokenizerFast
 
 from spert import models, prediction
 from spert import sampling
@@ -35,19 +35,19 @@ class SpERTTrainer(BaseTrainer):
         # byte-pair encoding
         mtype = args.model_type
         if mtype == 'spert':
-            self._tokenizer = BertTokenizer.from_pretrained(args.tokenizer_path,
+            self._tokenizer = BertTokenizerFast.from_pretrained(args.tokenizer_path,
                                                         do_lower_case=args.lowercase,
                                                         cache_dir=args.cache_path)
         elif mtype == 'sprob':
-            self._tokenizer = RobertaTokenizer.from_pretrained(args.tokenizer_path,
+            self._tokenizer = RobertaTokenizerFast.from_pretrained(args.tokenizer_path,
                                                         do_lower_case=args.lowercase,
                                                         cache_dir=args.cache_path)
         elif mtype == 'splong':
-            self._tokenizer = LongformerTokenizer.from_pretrained(args.tokenizer_path,
+            self._tokenizer = LongformerTokenizerFast.from_pretrained(args.tokenizer_path,
                                                         do_lower_case=args.lowercase,
                                                         cache_dir=args.cache_path)
         elif mtype == 'spelec':
-            self._tokenizer = ElectraTokenizer.from_pretrained(args.tokenizer_path,
+            self._tokenizer = ElectraTokenizerFast.from_pretrained(args.tokenizer_path,
                                                         do_lower_case=args.lowercase,
                                                         cache_dir=args.cache_path)
         else:
@@ -197,7 +197,9 @@ class SpERTTrainer(BaseTrainer):
                                             prop_drop=self._args.prop_drop,
                                             size_embedding=self._args.size_embedding,
                                             freeze_transformer=self._args.freeze_transformer,
-                                            cache_dir=self._args.cache_path)
+                                            cache_dir=self._args.cache_path,
+                                            output_hidden_states = self._args.output_hidden_states,
+                                            hidden_state_from_layer = self._args.hidden_state_from_layer)
 
         return model
 
@@ -251,12 +253,13 @@ class SpERTTrainer(BaseTrainer):
         examples_path = os.path.join(self._log_path, f'examples_%s_{dataset.label}_epoch_{epoch}.html')
         evaluator = Evaluator(dataset, input_reader, self._tokenizer,
                               self._args.rel_filter_threshold, self._args.no_overlapping, predictions_path,
-                              examples_path, self._args.example_count, log_path = self._log_path)
+                              examples_path, self._args.example_count, log_path = self._log_path,
+                              f_score_beta = self._args.f_score_beta)
 
         # create data loader
         dataset.switch_mode(Dataset.EVAL_MODE)
         data_loader = DataLoader(dataset, batch_size=self._args.eval_batch_size, shuffle=False, drop_last=False,
-                                 num_workers=self._args.sampling_processes, collate_fn=sampling.collate_fn_padding)
+                                 num_workers=self._args.sampling_processes, collate_fn=self.collate_fn_padding)
 
         with torch.no_grad():
             model.eval()

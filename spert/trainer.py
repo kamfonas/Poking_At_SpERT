@@ -9,7 +9,7 @@ import torch
 from torch.nn import DataParallel
 from torch.optim import Optimizer
 from transformers import PreTrainedModel
-from transformers import PreTrainedTokenizer
+from transformers import PreTrainedTokenizerFast
 
 from spert import util
 from spert.opt import tensorboardX
@@ -95,7 +95,7 @@ class BaseTrainer:
         logs = self._log_paths[dataset_label]
         util.append_csv(logs[data_label], *data)
 
-    def _save_best(self, model: PreTrainedModel, tokenizer: PreTrainedTokenizer, optimizer: Optimizer,
+    def _save_best(self, model: PreTrainedModel, tokenizer: PreTrainedTokenizerFast, optimizer: Optimizer,
                    accuracy: float, iteration: int, label: str, extra=None):
         if accuracy > self._best_results[label]:
             self._logger.info("[%s] Best model in iteration %s: %s%% accuracy" % (label, iteration, accuracy))
@@ -104,7 +104,7 @@ class BaseTrainer:
                              save_as_best=True, name='model_%s' % label, extra=extra)
             self._best_results[label] = accuracy
 
-    def _save_model(self, save_path: str, model: PreTrainedModel, tokenizer: PreTrainedTokenizer,
+    def _save_model(self, save_path: str, model: PreTrainedModel, tokenizer: PreTrainedTokenizerFast,
                     iteration: int, optimizer: Optimizer = None, save_as_best: bool = False,
                     extra: dict = None, include_iteration: int = True, name: str = 'model'):
         extra_state = dict(iteration=iteration)
