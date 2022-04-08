@@ -35,7 +35,7 @@
         },
         {
             // oringinal spert example using new config file
-            "name": "spert-train-L",
+            "name": "spert-train-A",
             "type": "python",
             "request": "launch",
             "program": "spert.py",
@@ -44,10 +44,28 @@
             "args": [
                 "train",
                 "--config",
-                    //"configs/train_bert1L.conf", // Our best of 5 bert-conll04 run
+                    //"configs/train_bert1A.conf", // Our best of 5 bert-conll04 run
                     //"configs/train_bert2L.conf", // Our best of 5 bert-ADE run
                     //"configs/train_bert3L.conf", // Our best of 5 bert-sciERC run
-                    "configs/train_bert4L.conf", // Our best of 5 bert-sciERC run
+                    //"configs/train_bert4L.conf", // Our best of 5 bert-sciERC run
+                    "configs/train_bert4A.conf", // Our best of 5 bert-sciERC run
+                ]
+        },
+        {    // Roberta for level comparisons
+            "name": "sprob-train-A",
+            "type": "python",
+            "request": "launch",
+            "program": "spert.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args": [
+                "train",
+                "--config",
+                    //"configs/train_roberta1A.conf", // CoNLL04 layers
+                    //"configs/train_bert2L.conf", 
+                    //"configs/train_bert3L.conf", 
+                    //"configs/train_bert4L.conf",
+                    "configs/train_roberta4A.conf", // DocRed layers
                 ]
         },
         {
@@ -165,6 +183,20 @@
             "args": [
                 "eval",
                 "--config","configs/eval_roberta1.conf"
+            ]
+        },
+        {
+            // Roberta evaluation configuration
+            //picks up model from models//roberta/<dataset>
+            "name": "sprob-eval-L",
+            "type": "python",
+            "request": "launch",
+            "program": "spert.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args": [
+                "eval",
+                "--config","configs/eval_roberta4L.conf"
             ]
         },
         {

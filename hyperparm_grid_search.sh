@@ -1,9 +1,9 @@
 #!/usr/bin/bash
 
-LR=(0.00003 0.00005 0.00008) # (0.00006 0.00002) #
+LR=(0.00001) # (0.00006 0.00002) #
 WEIGHT_DECAY=(0.10 0.0) # (0.010 0.005 0) #
 REL_FILTER_THRESHOLD=(0.50)
-PROP_DROP=(0.20 0.10)
+PROP_DROP=(0.20)
 #conda activate nlu
 for lr in ${LR[@]} ; do
     for weight_decay in ${WEIGHT_DECAY[@]} ; do

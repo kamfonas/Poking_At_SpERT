@@ -5,7 +5,7 @@ from typing import List, Tuple, Dict
 
 import torch
 from sklearn.metrics import precision_recall_fscore_support as prfs
-from transformers import PreTrainedTokenizerFast #BertTokenizerFast,RobertaTokenizerFast, LongformerTokenizerFast
+from transformers import PreTrainedTokenizer #BertTokenizerFast,RobertaTokenizer, LongformerTokenizer
 
 from spert import prediction
 from spert.entities import Document, Dataset, EntityType
@@ -18,7 +18,7 @@ SCRIPT_PATH = os.path.dirname(os.path.realpath(__file__))
 
 
 class Evaluator:
-    def __init__(self, dataset: Dataset, input_reader: BaseInputReader, text_encoder: PreTrainedTokenizerFast,
+    def __init__(self, dataset: Dataset, input_reader: BaseInputReader, text_encoder: PreTrainedTokenizer,
                  rel_filter_threshold: float, no_overlapping: bool,
                  predictions_path: str, examples_path: str, example_count: int, log_path = SCRIPT_PATH.join('data'),
                  f_score_beta = 1.0):

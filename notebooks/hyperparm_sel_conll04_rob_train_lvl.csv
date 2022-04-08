@@ -1,0 +1,2 @@
+,label,runID,ner_f1_macro,rel_f1_macro,rel_nec_f1_macro,ner_f1_micro,rel_f1_micro,rel_nec_f1_micro,train_batch_size,epochs,neg_entity_count,neg_relation_count,lr,weight_decay,eval_batch_size,rel_filter_threshold,prop_drop
+90,conll04_rob_train_lvl,2022-03-31_10.44.39.925787,80.70241733832201,68.09264155636647,67.88211524057701,84.71372984991663,65.85365853658537,65.54878048780488,4,20,100,100,4e-05,0.0,1,0.5,0.0

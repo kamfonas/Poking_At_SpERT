@@ -11,7 +11,7 @@ from torch.optim import Optimizer
 import transformers
 from torch.utils.data import DataLoader
 from transformers import AdamW, BertConfig,RobertaConfig,LongformerConfig, ElectraConfig
-from transformers import BertTokenizerFast,RobertaTokenizerFast,LongformerTokenizerFast, ElectraTokenizerFast
+from transformers import BertTokenizer,RobertaTokenizer,LongformerTokenizer, ElectraTokenizer
 
 from spert import models, prediction
 from spert import sampling
@@ -35,19 +35,19 @@ class SpERTTrainer(BaseTrainer):
         # byte-pair encoding
         mtype = args.model_type
         if mtype == 'spert':
-            self._tokenizer = BertTokenizerFast.from_pretrained(args.tokenizer_path,
+            self._tokenizer = BertTokenizer.from_pretrained(args.tokenizer_path,
                                                         do_lower_case=args.lowercase,
                                                         cache_dir=args.cache_path)
         elif mtype == 'sprob':
-            self._tokenizer = RobertaTokenizerFast.from_pretrained(args.tokenizer_path,
+            self._tokenizer = RobertaTokenizer.from_pretrained(args.tokenizer_path,
                                                         do_lower_case=args.lowercase,
                                                         cache_dir=args.cache_path)
         elif mtype == 'splong':
-            self._tokenizer = LongformerTokenizerFast.from_pretrained(args.tokenizer_path,
+            self._tokenizer = LongformerTokenizer.from_pretrained(args.tokenizer_path,
                                                         do_lower_case=args.lowercase,
                                                         cache_dir=args.cache_path)
         elif mtype == 'spelec':
-            self._tokenizer = ElectraTokenizerFast.from_pretrained(args.tokenizer_path,
+            self._tokenizer = ElectraTokenizer.from_pretrained(args.tokenizer_path,
                                                         do_lower_case=args.lowercase,
                                                         cache_dir=args.cache_path)
         else:

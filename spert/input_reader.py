@@ -4,7 +4,7 @@ from collections import OrderedDict
 from logging import Logger
 from typing import List
 from tqdm import tqdm
-from transformers import BertTokenizer, PreTrainedTokenizerFast
+from transformers import BertTokenizer, PreTrainedTokenizer,PreTrainedTokenizer
 
 from spert import util
 from spert.entities import Dataset, EntityType, RelationType, Entity, Relation, Document
@@ -12,7 +12,7 @@ from spert.opt import spacy
 
 
 class BaseInputReader(ABC):
-    def __init__(self, types_path: str, tokenizer: PreTrainedTokenizerFast, neg_entity_count: int = None,
+    def __init__(self, types_path: str, tokenizer: PreTrainedTokenizer, neg_entity_count: int = None,
                  neg_rel_count: int = None, max_span_size: int = None, logger: Logger = None, **kwargs):
         types = json.load(open(types_path), object_pairs_hook=OrderedDict)  # entity + relation types
 
@@ -112,7 +112,7 @@ class BaseInputReader(ABC):
 
 
 class JsonInputReader(BaseInputReader):
-    def __init__(self, types_path: str, tokenizer: PreTrainedTokenizerFast, neg_entity_count: int = None,
+    def __init__(self, types_path: str, tokenizer: PreTrainedTokenizer, neg_entity_count: int = None,
                  neg_rel_count: int = None, max_span_size: int = None, logger: Logger = None):
         super().__init__(types_path, tokenizer, neg_entity_count, neg_rel_count, max_span_size, logger)
 
@@ -189,7 +189,7 @@ class JsonInputReader(BaseInputReader):
 
 
 class JsonPredictionInputReader(BaseInputReader):
-    def __init__(self, types_path: str, tokenizer: PreTrainedTokenizerFast, spacy_model: str = None,
+    def __init__(self, types_path: str, tokenizer: PreTrainedTokenizer, spacy_model: str = None,
                  max_span_size: int = None, logger: Logger = None):
         super().__init__(types_path, tokenizer, max_span_size=max_span_size, logger=logger)
         self._spacy_model = spacy_model
